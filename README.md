@@ -4,8 +4,8 @@
 ![Telethon](https://img.shields.io/badge/Telethon-1.21.1-blue)
 ![Pyrogram](https://img.shields.io/badge/Pyrogram-1.4.16-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
-![GitHub stars](https://img.shields.io/github/stars/abirxdhack/StringSessionBot?style=social)
-![GitHub forks](https://img.shields.io/github/forks/abirxdhack/StringSessionBot?style=social)
+![GitHub stars](https://img.shields.io/github/stars/abirxdhack/StringSessionBot)
+![GitHub forks](https://img.shields.io/github/forks/abirxdhack/StringSessionBot)
 
 Welcome to the Telegram Session String Generator Bot! This bot helps you generate session strings for both Pyrogram and Telethon clients securely and easily. 🚀
 
