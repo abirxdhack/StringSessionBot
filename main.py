@@ -59,29 +59,14 @@ async def handle_start(client, message, platform):
     session_type = "Telethon" if platform == "Telethon" else "Pyrogram"
     session_data[message.chat.id] = {"type": session_type}
     await message.reply(
-        f"**Welcome to the {session_type} Session Setup!**\n"
+        f"**Welcome to the {session_type} session setup!**\n"
         "**━━━━━━━━━━━━━━━━━**\n"
         "**This is a totally safe session string generator. We don't save any info that you will provide, so this is completely safe.**\n\n"
-        "**Steps to Generate Session String:**\n"
-        "1. You'll be asked to provide your **API ID**. You can obtain it from my.telegram.org.\n"
-        "2. Then, you'll need to provide your **API Hash**. Again, you can get it from my.telegram.org.\n"
-        "3. After that, you'll need to provide your **phone number** associated with your Telegram account.\n"
-        "4. You'll receive an OTP (One-Time Password) on your Telegram account. Please enter it when prompted.\n"
-        "5. If you have 2FA (Two-Factor Authentication) enabled, you will need to provide your password.\n\n"
-        "**Notes and Cautions:**\n"
-        "- **Do not share your session string with anyone.** It can be used to access your Telegram account.\n"
-        "- **Do not send the OTP directly in any other chat.** Doing so may result in your account being banned or you may face other issues logging in.\n"
-        "- **Ensure you provide accurate information.** Incorrect details may result in failed session generation.\n\n"
-        "**━━━━━━━━━━━━━━━━━**",
-        reply_markup=InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton("🔄Update Channel", url="https://t.me/ModVipRM"),
-                InlineKeyboardButton("My Dev👨‍💻", user_id=7303810912)
-            ], [
-                InlineKeyboardButton("Go", callback_data=f"session_go_{session_type.lower()}"),
-                InlineKeyboardButton("Close", callback_data="session_close")
-            ]
-        ])
+        "**Note: Don't send OTP directly. Otherwise, your account could be banned, or you may not be able to log in.**",
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("Go", callback_data=f"session_go_{session_type.lower()}"),
+            InlineKeyboardButton("Close", callback_data="session_close")
+        ]])
     )
 
 async def handle_callback_query(client, callback_query):
@@ -89,7 +74,11 @@ async def handle_callback_query(client, callback_query):
     chat_id = callback_query.message.chat.id
 
     if data == "session_close":
-        await callback_query.message.edit_text("Session generation process has been closed.")
+        platform = session_data[chat_id]["type"].lower()
+        if platform == "pyrogram":
+            await callback_query.message.edit_text("**Cancelled. You can start by sending /pyro**", parse_mode=ParseMode.MARKDOWN)
+        else:
+            await callback_query.message.edit_text("**Cancelled. You can start by sending /tele**", parse_mode=ParseMode.MARKDOWN)
         if chat_id in session_data:
             del session_data[chat_id]
         return
@@ -152,7 +141,7 @@ async def handle_text(client, message: Message):
         await send_otp(client, message, otp_message)
 
     elif stage == "otp":
-        otp = ''.join([char for char in message.text if char isdigit()])
+        otp = ''.join([char for char in message.text if char.isdigit()])
         session["otp"] = otp
         otp_message = await message.reply("Validating OTP.....")
         await validate_otp(client, message, otp_message)
