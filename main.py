@@ -35,7 +35,7 @@ TIMEOUT_2FA = 300  # 5 minutes
 session_data = {}
 
 def setup_string_handler(app: Client):
-    @app.on_message(filters.command(["pyro", "tele"], prefixes=["/", "."]) & (filters.private | filters.group))
+    @app.on_message(filters.command(["pyro", "tele"], prefixes=["/", ".", ",", "!"]) & (filters.private | filters.group))
     async def session_setup(client, message: Message):
         if message.chat.type in (ChatType.SUPERGROUP, ChatType.GROUP):
             await client.send_message(
@@ -99,12 +99,12 @@ async def handle_callback_query(client, callback_query):
     if data.startswith("session_start_"):
         session_type = data.split('_')[2]
         await callback_query.message.edit_text(
-            "<b>Send Your API ID</b>",
+            "**Send Your API ID**",
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton("Restart", callback_data=f"session_restart_{session_type}"),
                 InlineKeyboardButton("Close", callback_data="session_close")
             ]]),
-            parse_mode=ParseMode.HTML
+            parse_mode=ParseMode.MARKDOWN
         )
         session_data[chat_id]["stage"] = "api_id"
 
@@ -126,12 +126,12 @@ async def handle_text(client, message: Message):
             session["api_id"] = api_id
             await client.send_message(
                 chat_id=message.chat.id,
-                text="<b>Send Your API Hash</b>",
+                text="**Send Your API Hash**",
                 reply_markup=InlineKeyboardMarkup([[
                     InlineKeyboardButton("Restart", callback_data=f"session_restart_{session['type'].lower()}"),
                     InlineKeyboardButton("Close", callback_data="session_close")
                 ]]),
-                parse_mode=ParseMode.HTML
+                parse_mode=ParseMode.MARKDOWN 
             )
             session["stage"] = "api_hash"
         except ValueError:
@@ -144,12 +144,12 @@ async def handle_text(client, message: Message):
         session["api_hash"] = message.text
         await client.send_message(
             chat_id=message.chat.id,
-            text="<b>Send Your Phone Number\n[Example: +880xxxxxxxxxx]</b>",
+            text="** Send Your Phone Number\n[Example: +880xxxxxxxxxx] **",
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton("Restart", callback_data=f"session_restart_{session['type'].lower()}"),
                 InlineKeyboardButton("Close", callback_data="session_close")
             ]]),
-            parse_mode=ParseMode.HTML
+            parse_mode=ParseMode.MARKDOWN 
         )
         session["stage"] = "phone_number"
 
@@ -157,7 +157,7 @@ async def handle_text(client, message: Message):
         session["phone_number"] = message.text
         otp_message = await client.send_message(
             chat_id=message.chat.id,
-            text="**💥Sending OTP.....**"
+            text="**💥Sending OTP Check PM.....**"
         )
         await send_otp(client, message, otp_message)
 
@@ -166,7 +166,7 @@ async def handle_text(client, message: Message):
         session["otp"] = otp
         otp_message = await client.send_message(
             chat_id=message.chat.id,
-            text="**💥Validating OTP.....**"
+            text="**💥Validating Your Inputed OTP.....**"
         )
         await validate_otp(client, message, otp_message)
 
@@ -207,7 +207,7 @@ async def send_otp(client, message, otp_message):
                 InlineKeyboardButton("Restart", callback_data=f"session_restart_{session['type'].lower()}"),
                 InlineKeyboardButton("Close", callback_data="session_close")
             ]]),
-            parse_mode=ParseMode.MARKDOWN
+            parse_mode=ParseMode.MARKDOWN 
         )
         await otp_message.delete()
     except (ApiIdInvalid, ApiIdInvalidError):
@@ -289,7 +289,7 @@ async def validate_otp(client, message, otp_message):
                 InlineKeyboardButton("Restart", callback_data=f"session_restart_{session['type'].lower()}"),
                 InlineKeyboardButton("Close", callback_data="session_close")
             ]]),
-            parse_mode=ParseMode.MARKDOWN
+            parse_mode=ParseMode.MARKDOWN 
         )
         await otp_message.delete()
 
